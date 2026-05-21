@@ -4,6 +4,8 @@ import in.abdulmajid.cardiq.category.dto.CategoryResponse;
 import in.abdulmajid.cardiq.category.dto.CreateCategoryRequest;
 import in.abdulmajid.cardiq.category.entity.Category;
 import in.abdulmajid.cardiq.category.repository.CategoryRepository;
+import in.abdulmajid.cardiq.exception.DuplicateResourceException;
+import in.abdulmajid.cardiq.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,13 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryResponse createCategory(CreateCategoryRequest request) {
+    public CategoryResponse createCategory(
+            CreateCategoryRequest request
+    ) {
+
+        if (categoryRepository.existsByNameIgnoreCase(request.getName())) {
+            throw new DuplicateResourceException("Category already exists");
+        }
 
         Category category = new Category();
 
@@ -24,22 +32,63 @@ public class CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
 
-        return CategoryResponse.builder()
-                .id(savedCategory.getId())
-                .name(savedCategory.getName())
-                .description(savedCategory.getDescription())
-                .build();
+        return mapToResponse(savedCategory);
     }
 
     public List<CategoryResponse> getAllCategories() {
 
         return categoryRepository.findAll()
                 .stream()
-                .map(category -> CategoryResponse.builder()
-                        .id(category.getId())
-                        .name(category.getName())
-                        .description(category.getDescription())
-                        .build())
+                .map(this::mapToResponse)
                 .toList();
+    }
+
+    public CategoryResponse getCategoryById(Long id) {
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found")
+                );
+
+        return mapToResponse(category);
+    }
+
+    public CategoryResponse updateCategory(
+            Long id,
+            CreateCategoryRequest request
+    ) {
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found")
+                );
+
+        category.setName(request.getName());
+        category.setDescription(request.getDescription());
+
+        Category updatedCategory = categoryRepository.save(category);
+
+        return mapToResponse(updatedCategory);
+    }
+
+    public void deleteCategory(Long id) {
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category not found")
+                );
+
+        categoryRepository.delete(category);
+    }
+
+    private CategoryResponse mapToResponse(
+            Category category
+    ) {
+
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .description(category.getDescription())
+                .build();
     }
 }

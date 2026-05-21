@@ -38,4 +38,43 @@ public class CategoryController {
                 .data(categoryService.getAllCategories())
                 .build();
     }
+
+    @GetMapping("/{id}")
+    public ApiResponse<CategoryResponse> getCategoryById(
+            @PathVariable Long id
+    ) {
+
+        return ApiResponse.<CategoryResponse>builder()
+                .success(true)
+                .message("Category fetched successfully")
+                .data(categoryService.getCategoryById(id))
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<CategoryResponse> updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody CreateCategoryRequest request
+    ) {
+
+        return ApiResponse.<CategoryResponse>builder()
+                .success(true)
+                .message("Category updated successfully")
+                .data(categoryService.updateCategory(id, request))
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteCategory(
+            @PathVariable Long id
+    ) {
+
+        categoryService.deleteCategory(id);
+
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Category deleted successfully")
+                .data(null)
+                .build();
+    }
 }
