@@ -1,5 +1,7 @@
 package in.abdulmajid.cardiq.search.dto;
 
+import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
+import in.abdulmajid.cardiq.offer.enums.OfferType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,9 +17,17 @@ public class SearchCardResponse {
 
     private Double value;
 
-    private String offerType;
+    private OfferType offerType;
 
     private String merchantName;
 
     private String categoryName;
+
+    private OfferPlatform platform;
+
+    private Boolean permanentOffer;
+
+    private Boolean limitedTimeOffer;
+
+    private Integer priority;
 }

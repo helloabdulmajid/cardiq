@@ -27,9 +27,22 @@ public class SearchService {
                         .bankName(offer.getCard().getBank().getName())
                         .offerTitle(offer.getTitle())
                         .value(offer.getValue())
-                        .offerType(offer.getOfferType().name())
+                        .offerType(offer.getOfferType())
                         .merchantName(offer.getMerchant().getName())
                         .categoryName(offer.getCategory().getName())
+                        .platform(offer.getPlatform())
+
+                        .permanentOffer(
+                                offer.getPermanentOffer()
+                        )
+
+                        .limitedTimeOffer(
+                                offer.getLimitedTimeOffer()
+                        )
+
+                        .priority(
+                                offer.getPriority()
+                        )
                         .build())
                 .toList();
 

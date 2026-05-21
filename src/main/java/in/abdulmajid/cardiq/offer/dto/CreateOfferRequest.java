@@ -1,5 +1,8 @@
 package in.abdulmajid.cardiq.offer.dto;
 
+import in.abdulmajid.cardiq.card.enums.CardNetwork;
+import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
+import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +42,8 @@ public class CreateOfferRequest {
     @NotNull(message = "End date is required")
     private LocalDate endDate;
 
+    private LocalDate verifiedAt;
+
     private String sourceUrl;
 
     @NotNull(message = "Card ID is required")
@@ -49,4 +54,20 @@ public class CreateOfferRequest {
 
     @NotNull(message = "Category ID is required")
     private Long categoryId;
+
+    @NotNull(message = "Offer platform is required")
+    private OfferPlatform platform;
+
+    @NotNull(message = "Benefit period is required")
+    private BenefitPeriod benefitPeriod;
+
+    private CardNetwork applicableNetwork;
+
+    private String milestoneBenefit;
+
+    private Boolean limitedTimeOffer = false;
+
+    private Integer priority = 0;
+
+    private Boolean permanentOffer = false;
 }

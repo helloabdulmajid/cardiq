@@ -1,5 +1,8 @@
 package in.abdulmajid.cardiq.offer.dto;
 
+import in.abdulmajid.cardiq.card.enums.CardNetwork;
+import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
+import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,4 +42,18 @@ public class OfferResponse {
     private String merchantName;
 
     private String categoryName;
+
+    private OfferPlatform platform;
+
+    private BenefitPeriod benefitPeriod;
+
+    private CardNetwork applicableNetwork;
+
+    private String milestoneBenefit;
+
+    private Boolean limitedTimeOffer;
+
+    private Integer priority;
+
+    private Boolean permanentOffer;
 }
