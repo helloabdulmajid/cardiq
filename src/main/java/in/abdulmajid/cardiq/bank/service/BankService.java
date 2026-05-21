@@ -4,9 +4,11 @@ import in.abdulmajid.cardiq.bank.dto.BankResponse;
 import in.abdulmajid.cardiq.bank.dto.CreateBankRequest;
 import in.abdulmajid.cardiq.bank.entity.Bank;
 import in.abdulmajid.cardiq.bank.repository.BankRepository;
+import in.abdulmajid.cardiq.card.repository.CardRepository;
 import in.abdulmajid.cardiq.exception.DuplicateResourceException;
 import in.abdulmajid.cardiq.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 public class BankService {
 
     private final BankRepository bankRepository;
+    private final CardRepository cardRepository;
 
     public BankResponse createBank(CreateBankRequest request) {
 
@@ -77,6 +80,12 @@ public class BankService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Bank not found")
                 );
+
+        if (cardRepository.existsByBank_Id(id)) {
+            throw new DuplicateResourceException(
+                    "Cannot delete bank because cards are associated with it"
+            );
+        }
 
         bankRepository.delete(bank);
     }
