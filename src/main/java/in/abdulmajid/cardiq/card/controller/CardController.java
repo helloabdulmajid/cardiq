@@ -1,5 +1,6 @@
 package in.abdulmajid.cardiq.card.controller;
 
+import in.abdulmajid.cardiq.card.dto.CardResponse;
 import in.abdulmajid.cardiq.card.entity.Card;
 import in.abdulmajid.cardiq.card.service.CardService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ public class CardController {
     private final CardService cardService;
 
     @GetMapping
-    public List<Card> getAllCards() {
+    List<CardResponse> getAllCards() {
         return cardService.getAllCards();
     }
 }
