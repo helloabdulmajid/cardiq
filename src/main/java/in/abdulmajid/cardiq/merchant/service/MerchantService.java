@@ -6,6 +6,7 @@ import in.abdulmajid.cardiq.merchant.dto.CreateMerchantRequest;
 import in.abdulmajid.cardiq.merchant.dto.MerchantResponse;
 import in.abdulmajid.cardiq.merchant.entity.Merchant;
 import in.abdulmajid.cardiq.merchant.repository.MerchantRepository;
+import in.abdulmajid.cardiq.offer.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class MerchantService {
 
     private final MerchantRepository merchantRepository;
+    private final OfferRepository offerRepository;
 
     public MerchantResponse createMerchant(
             CreateMerchantRequest request
@@ -75,10 +77,17 @@ public class MerchantService {
 
     public void deleteMerchant(Long id) {
 
+
         Merchant merchant = merchantRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Merchant not found")
                 );
+
+        if (offerRepository.existsByMerchant_Id(id)) {
+            throw new DuplicateResourceException(
+                    "Cannot delete merchant because offers are associated with it"
+            );
+        }
 
         merchantRepository.delete(merchant);
     }

@@ -6,6 +6,7 @@ import in.abdulmajid.cardiq.category.entity.Category;
 import in.abdulmajid.cardiq.category.repository.CategoryRepository;
 import in.abdulmajid.cardiq.exception.DuplicateResourceException;
 import in.abdulmajid.cardiq.exception.ResourceNotFoundException;
+import in.abdulmajid.cardiq.offer.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final OfferRepository offerRepository;
 
     public CategoryResponse createCategory(
             CreateCategoryRequest request
@@ -77,6 +79,11 @@ public class CategoryService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found")
                 );
+        if (offerRepository.existsByCategory_Id(id)) {
+            throw new DuplicateResourceException(
+                    "Cannot delete category because offers are associated with it"
+            );
+        }
 
         categoryRepository.delete(category);
     }

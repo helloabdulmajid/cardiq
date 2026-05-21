@@ -13,4 +13,7 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     );
 
     boolean existsByCard_Id(Long cardId);
+    boolean existsByMerchant_Id(Long merchantId);
+
+    boolean existsByCategory_Id(Long categoryId);
 }
