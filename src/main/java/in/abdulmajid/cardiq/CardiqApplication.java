@@ -8,6 +8,7 @@ public class CardiqApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CardiqApplication.class, args);
+        System.out.println("Hey Abdul, Apps Running...");
 	}
 
 }
