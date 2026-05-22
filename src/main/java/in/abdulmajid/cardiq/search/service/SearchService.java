@@ -16,8 +16,17 @@ public class SearchService {
 
     public List<SearchCardResponse> search(String keyword) {
 
+        if (keyword == null || keyword.isBlank()) {
+            throw new ResourceNotFoundException(
+                    "Search keyword is required"
+            );
+        }
+
         List<SearchCardResponse> results = offerRepository
-                .findByMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrderByValueDesc(
+                .findDistinctByTitleContainingIgnoreCaseOrMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrCard_NameContainingIgnoreCaseOrCard_Bank_NameContainingIgnoreCaseOrderByPriorityDescValueDesc(
+                        keyword,
+                        keyword,
+                        keyword,
                         keyword,
                         keyword
                 )
@@ -38,6 +47,17 @@ public class SearchService {
 
                         .limitedTimeOffer(
                                 offer.getLimitedTimeOffer()
+                        )
+                        .imageUrl(
+                                offer.getCard().getImageUrl()
+                        )
+
+                        .network(
+                                offer.getCard().getNetwork().name()
+                        )
+
+                        .rewardType(
+                                offer.getCard().getRewardType().name()
                         )
 
                         .priority(

@@ -24,7 +24,11 @@ public class SearchCardResponse {
     private String categoryName;
 
     private OfferPlatform platform;
+    private String imageUrl;
 
+    private String network;
+
+    private String rewardType;
     private Boolean permanentOffer;
 
     private Boolean limitedTimeOffer;

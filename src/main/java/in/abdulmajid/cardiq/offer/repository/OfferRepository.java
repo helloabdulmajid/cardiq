@@ -7,10 +7,28 @@ import java.util.List;
 
 public interface OfferRepository extends JpaRepository<Offer, Long> {
 
-    List<Offer> findByMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrderByValueDesc(
+//    List<Offer> findByMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrderByValueDesc(
+//            String merchant,
+//            String category
+//    );
+
+//    List<Offer> findByTitleContainingIgnoreCaseOrMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrCard_NameContainingIgnoreCaseOrCard_Bank_NameContainingIgnoreCaseOrderByPriorityDescValueDesc(
+//            String title,
+//            String merchant,
+//            String category,
+//            String card,
+//            String bank
+//    );
+
+    List<Offer>   findDistinctByTitleContainingIgnoreCaseOrMerchant_NameContainingIgnoreCaseOrCategory_NameContainingIgnoreCaseOrCard_NameContainingIgnoreCaseOrCard_Bank_NameContainingIgnoreCaseOrderByPriorityDescValueDesc
+            (
+            String title,
             String merchant,
-            String category
+            String category,
+            String card,
+            String bank
     );
+
 
     boolean existsByCard_Id(Long cardId);
     boolean existsByMerchant_Id(Long merchantId);
