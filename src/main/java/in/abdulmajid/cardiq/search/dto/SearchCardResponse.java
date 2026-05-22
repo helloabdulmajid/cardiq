@@ -1,5 +1,6 @@
 package in.abdulmajid.cardiq.search.dto;
 
+import in.abdulmajid.cardiq.benefit.enums.BenefitType;
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
 import lombok.Builder;
@@ -34,4 +35,7 @@ public class SearchCardResponse {
     private Boolean limitedTimeOffer;
 
     private Integer priority;
+    private String benefitRuleName;
+
+    private BenefitType benefitType;
 }

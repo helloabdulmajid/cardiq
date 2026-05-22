@@ -70,4 +70,6 @@ public class CreateOfferRequest {
     private Integer priority = 0;
 
     private Boolean permanentOffer = false;
+    @NotNull(message = "Benefit rule ID is required")
+    private Long benefitRuleId;
 }

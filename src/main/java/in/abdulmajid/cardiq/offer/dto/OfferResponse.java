@@ -1,5 +1,6 @@
 package in.abdulmajid.cardiq.offer.dto;
 
+import in.abdulmajid.cardiq.benefit.enums.BenefitType;
 import in.abdulmajid.cardiq.card.enums.CardNetwork;
 import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
@@ -56,4 +57,7 @@ public class OfferResponse {
     private Integer priority;
 
     private Boolean permanentOffer;
+    private String benefitRuleName;
+
+    private BenefitType benefitType;
 }

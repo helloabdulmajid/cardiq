@@ -1,5 +1,6 @@
 package in.abdulmajid.cardiq.offer.service;
 
+import in.abdulmajid.cardiq.benefit.entity.BenefitRule;
 import in.abdulmajid.cardiq.card.entity.Card;
 import in.abdulmajid.cardiq.card.repository.CardRepository;
 import in.abdulmajid.cardiq.category.entity.Category;
@@ -12,6 +13,7 @@ import in.abdulmajid.cardiq.offer.dto.CreateOfferRequest;
 import in.abdulmajid.cardiq.offer.dto.OfferResponse;
 import in.abdulmajid.cardiq.offer.entity.Offer;
 import in.abdulmajid.cardiq.offer.repository.OfferRepository;
+import in.abdulmajid.cardiq.benefit.repository.BenefitRuleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class OfferService {
     private final MerchantRepository merchantRepository;
 
     private final CategoryRepository categoryRepository;
+    private final BenefitRuleRepository benefitRuleRepository;
 
     public OfferResponse createOffer(
             CreateOfferRequest request
@@ -49,6 +52,15 @@ public class OfferService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found")
                 );
+        BenefitRule benefitRule =
+                benefitRuleRepository.findById(
+                                request.getBenefitRuleId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Benefit rule not found"
+                                )
+                        );
 
         Offer offer = new Offer();
 
@@ -57,7 +69,8 @@ public class OfferService {
                 request,
                 card,
                 merchant,
-                category
+                category,
+                benefitRule
         );
 
         Offer savedOffer = offerRepository.save(offer);
@@ -109,13 +122,23 @@ public class OfferService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Category not found")
                 );
+        BenefitRule benefitRule =
+                benefitRuleRepository.findById(
+                                request.getBenefitRuleId()
+                        )
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException(
+                                        "Benefit rule not found"
+                                )
+                        );
 
         mapRequestToEntity(
                 offer,
                 request,
                 card,
                 merchant,
-                category
+                category,
+                benefitRule
         );
 
         Offer updatedOffer = offerRepository.save(offer);
@@ -151,7 +174,8 @@ public class OfferService {
             CreateOfferRequest request,
             Card card,
             Merchant merchant,
-            Category category
+            Category category,
+            BenefitRule benefitRule
     ) {
 
         offer.setTitle(request.getTitle());
@@ -203,6 +227,7 @@ public class OfferService {
         offer.setMerchant(merchant);
 
         offer.setCategory(category);
+        offer.setBenefitRule(benefitRule);
     }
 
     private OfferResponse mapToResponse(

@@ -1,5 +1,6 @@
 package in.abdulmajid.cardiq.offer.entity;
 
+import in.abdulmajid.cardiq.benefit.entity.BenefitRule;
 import in.abdulmajid.cardiq.card.entity.Card;
 import in.abdulmajid.cardiq.card.enums.CardNetwork;
 import in.abdulmajid.cardiq.category.entity.Category;
@@ -67,4 +68,7 @@ public class Offer extends BaseEntity {
     private Boolean limitedTimeOffer = false;
     private Integer priority = 0;
     private Boolean permanentOffer = false;
+
+    @ManyToOne
+    private BenefitRule benefitRule;
 }
