@@ -8,6 +8,7 @@ import in.abdulmajid.cardiq.search.dto.SearchCardResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -73,6 +74,12 @@ public class SearchService {
                              */
 
                             int relevanceScore = 0;
+
+                            List<String> matchedKeywords =
+                                    new ArrayList<>();
+
+                            List<String> unmatchedKeywords =
+                                    new ArrayList<>();
 
 
                             /*
@@ -230,13 +237,41 @@ public class SearchService {
                                     relevanceScore += 25;
                                 }
 
-
                                 /*
-                                 * If keyword not matched,
-                                 * reject this offer
+                                 * Match offer platform
                                  */
 
-                                if (!matched) {
+                                if (!matched &&
+                                        offer.getPlatform() != null &&
+                                        offer.getPlatform()
+                                                .name()
+                                                .toLowerCase()
+                                                .contains(word)) {
+
+                                    matched = true;
+
+                                    relevanceScore += 20;
+                                }
+
+
+                                /*
+                                 * If keyword not matched or matched added keyword
+                                 * not reject this offer
+                                 */
+                                if (matched) {
+
+                                    matchedKeywords.add(word);
+
+                                } else {
+
+                                    unmatchedKeywords.add(word);
+                                }
+
+                                /*
+                                 * Reject weak matches
+                                 */
+
+                                if (matchedKeywords.isEmpty()) {
 
                                     return null;
                                 }
@@ -314,6 +349,14 @@ public class SearchService {
 
                             recommendationScore +=
                                     offer.getPriority();
+
+                            /*
+                             * Boost offers with more
+                             * matched keywords
+                             */
+
+                            relevanceScore +=
+                                    matchedKeywords.size() * 15;
 
 
                             /*
@@ -427,6 +470,17 @@ public class SearchService {
 
                                     .estimatedSavings(
                                             estimatedSavings
+                                    )
+                                    .matchedKeywords(
+                                            matchedKeywords
+                                    )
+
+                                    .unmatchedKeywords(
+                                            unmatchedKeywords
+                                    )
+
+                                    .matchedKeywordCount(
+                                            matchedKeywords.size()
                                     )
 
                                     .build();

@@ -6,6 +6,8 @@ import in.abdulmajid.cardiq.offer.enums.OfferType;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class SearchCardResponse {
@@ -41,5 +43,10 @@ public class SearchCardResponse {
     private String benefitRuleName;
     private String benefitSummary;
     private Double estimatedSavings;
+    private List<String> matchedKeywords;
+
+    private List<String> unmatchedKeywords;
+
+    private Integer matchedKeywordCount;
 
 }
