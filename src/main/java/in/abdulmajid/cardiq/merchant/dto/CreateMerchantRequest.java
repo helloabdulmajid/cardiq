@@ -1,7 +1,7 @@
 package in.abdulmajid.cardiq.merchant.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,14 +9,27 @@ import lombok.Setter;
 @Setter
 public class CreateMerchantRequest {
 
+    // =========================================================
+    // REQUIRED MERCHANT NAME
+    // =========================================================
+
     @NotBlank(message = "Merchant name is required")
     private String name;
+
+    // =========================================================
+    // OPTIONAL DETAILS
+    // =========================================================
+
+    private String slug;
+
+    private String code;
+
+    private String merchantType;
 
     private String logoUrl;
 
     private String websiteUrl;
 
-    @Column(length = 1000)
     private String description;
 
     private Boolean active = true;

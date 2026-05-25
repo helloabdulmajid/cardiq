@@ -2,9 +2,14 @@ package in.abdulmajid.cardiq.card.specification;
 
 import in.abdulmajid.cardiq.card.dto.CardFilterRequest;
 import in.abdulmajid.cardiq.card.entity.Card;
+
 import org.springframework.data.jpa.domain.Specification;
 
 public class CardSpecification {
+
+    // =========================================================
+    // DYNAMIC CARD FILTER
+    // =========================================================
 
     public static Specification<Card> filterCards(
             CardFilterRequest filter
@@ -12,7 +17,18 @@ public class CardSpecification {
 
         return (root, query, criteriaBuilder) -> {
 
-            var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+            // -------------------------------------------------
+            // STORE ALL FILTER CONDITIONS
+            // -------------------------------------------------
+
+            var predicates =
+                    new java.util.ArrayList<
+                            jakarta.persistence.criteria.Predicate
+                            >();
+
+            // -------------------------------------------------
+            // LTF FILTER
+            // -------------------------------------------------
 
             if (filter.getLtf() != null) {
 
@@ -24,6 +40,10 @@ public class CardSpecification {
                 );
             }
 
+            // -------------------------------------------------
+            // AIRPORT LOUNGE FILTER
+            // -------------------------------------------------
+
             if (filter.getAirportLoungeAccess() != null) {
 
                 predicates.add(
@@ -33,6 +53,10 @@ public class CardSpecification {
                         )
                 );
             }
+
+            // -------------------------------------------------
+            // RAILWAY LOUNGE FILTER
+            // -------------------------------------------------
 
             if (filter.getRailwayLoungeAccess() != null) {
 
@@ -44,6 +68,10 @@ public class CardSpecification {
                 );
             }
 
+            // -------------------------------------------------
+            // FUEL SURCHARGE FILTER
+            // -------------------------------------------------
+
             if (filter.getFuelSurchargeWaiver() != null) {
 
                 predicates.add(
@@ -53,6 +81,24 @@ public class CardSpecification {
                         )
                 );
             }
+
+            // -------------------------------------------------
+            // CO-BRANDED FILTER
+            // -------------------------------------------------
+
+            if (filter.getCoBranded() != null) {
+
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("coBranded"),
+                                filter.getCoBranded()
+                        )
+                );
+            }
+
+            // -------------------------------------------------
+            // CARD NETWORK FILTER
+            // -------------------------------------------------
 
             if (filter.getNetwork() != null) {
 
@@ -64,6 +110,10 @@ public class CardSpecification {
                 );
             }
 
+            // -------------------------------------------------
+            // CARD TYPE FILTER
+            // -------------------------------------------------
+
             if (filter.getCardType() != null) {
 
                 predicates.add(
@@ -73,6 +123,10 @@ public class CardSpecification {
                         )
                 );
             }
+
+            // -------------------------------------------------
+            // REWARD TYPE FILTER
+            // -------------------------------------------------
 
             if (filter.getRewardType() != null) {
 
@@ -84,6 +138,24 @@ public class CardSpecification {
                 );
             }
 
+            // -------------------------------------------------
+            // CARD LEVEL FILTER
+            // -------------------------------------------------
+
+            if (filter.getCardLevel() != null) {
+
+                predicates.add(
+                        criteriaBuilder.equal(
+                                root.get("cardLevel"),
+                                filter.getCardLevel()
+                        )
+                );
+            }
+
+            // -------------------------------------------------
+            // MAX ANNUAL FEE FILTER
+            // -------------------------------------------------
+
             if (filter.getMaxAnnualFee() != null) {
 
                 predicates.add(
@@ -93,6 +165,24 @@ public class CardSpecification {
                         )
                 );
             }
+
+            // -------------------------------------------------
+            // MAX FOREX MARKUP FILTER
+            // -------------------------------------------------
+
+            if (filter.getMaxForexMarkup() != null) {
+
+                predicates.add(
+                        criteriaBuilder.lessThanOrEqualTo(
+                                root.get("forexMarkup"),
+                                filter.getMaxForexMarkup()
+                        )
+                );
+            }
+
+            // -------------------------------------------------
+            // RETURN FINAL FILTER QUERY
+            // -------------------------------------------------
 
             return criteriaBuilder.and(
                     predicates.toArray(

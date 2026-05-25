@@ -16,9 +16,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BenefitRuleService {
 
+    // =========================================================
+    // REPOSITORIES
+    // =========================================================
+
     private final BenefitRuleRepository benefitRuleRepository;
 
     private final OfferRepository offerRepository;
+
+    // =========================================================
+    // CREATE RULE
+    // =========================================================
 
     public BenefitRuleResponse createRule(
             CreateBenefitRuleRequest request
@@ -34,6 +42,10 @@ public class BenefitRuleService {
         return mapToResponse(savedRule);
     }
 
+    // =========================================================
+    // GET ALL RULES
+    // =========================================================
+
     public List<BenefitRuleResponse> getAllRules() {
 
         return benefitRuleRepository.findAll()
@@ -41,6 +53,10 @@ public class BenefitRuleService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    // =========================================================
+    // GET RULE BY ID
+    // =========================================================
 
     public BenefitRuleResponse getRuleById(
             Long id
@@ -56,6 +72,10 @@ public class BenefitRuleService {
 
         return mapToResponse(rule);
     }
+
+    // =========================================================
+    // UPDATE RULE
+    // =========================================================
 
     public BenefitRuleResponse updateRule(
             Long id,
@@ -78,6 +98,10 @@ public class BenefitRuleService {
         return mapToResponse(updatedRule);
     }
 
+    // =========================================================
+    // DELETE RULE
+    // =========================================================
+
     public void deleteRule(Long id) {
 
         BenefitRule rule =
@@ -87,6 +111,8 @@ public class BenefitRuleService {
                                         "Benefit rule not found"
                                 )
                         );
+
+        // Prevent delete if offers are linked
 
         if (offerRepository.existsByBenefitRule(rule)) {
 
@@ -98,19 +124,25 @@ public class BenefitRuleService {
         benefitRuleRepository.delete(rule);
     }
 
+    // =========================================================
+    // REQUEST DTO -> ENTITY
+    // =========================================================
+
     private void mapRequestToEntity(
             BenefitRule rule,
             CreateBenefitRuleRequest request
     ) {
 
-        rule.setName(request.getName());
+        rule.setName(
+                request.getName()
+        );
 
         rule.setBenefitType(
                 request.getBenefitType()
         );
 
-        rule.setRewardPointValue(
-                request.getRewardPointValue()
+        rule.setRewardPointConversion(
+                request.getRewardPointConversion()
         );
 
         rule.setRedemptionFee(
@@ -129,24 +161,14 @@ public class BenefitRuleService {
                 request.getExpiryMonths()
         );
 
-        rule.setStatementCreditSupported(
-                request.getStatementCreditSupported()
+        rule.setNotes(
+                request.getNotes()
         );
-
-        rule.setWalletTransferSupported(
-                request.getWalletTransferSupported()
-        );
-
-        rule.setTravelRedemptionSupported(
-                request.getTravelRedemptionSupported()
-        );
-
-        rule.setVoucherRedemptionSupported(
-                request.getVoucherRedemptionSupported()
-        );
-
-        rule.setNotes(request.getNotes());
     }
+
+    // =========================================================
+    // ENTITY -> RESPONSE DTO
+    // =========================================================
 
     private BenefitRuleResponse mapToResponse(
             BenefitRule rule
@@ -156,8 +178,8 @@ public class BenefitRuleService {
                 .id(rule.getId())
                 .name(rule.getName())
                 .benefitType(rule.getBenefitType())
-                .rewardPointValue(
-                        rule.getRewardPointValue()
+                .rewardPointConversion(
+                        rule.getRewardPointConversion()
                 )
                 .redemptionFee(
                         rule.getRedemptionFee()
@@ -171,19 +193,9 @@ public class BenefitRuleService {
                 .expiryMonths(
                         rule.getExpiryMonths()
                 )
-                .statementCreditSupported(
-                        rule.getStatementCreditSupported()
+                .notes(
+                        rule.getNotes()
                 )
-                .walletTransferSupported(
-                        rule.getWalletTransferSupported()
-                )
-                .travelRedemptionSupported(
-                        rule.getTravelRedemptionSupported()
-                )
-                .voucherRedemptionSupported(
-                        rule.getVoucherRedemptionSupported()
-                )
-                .notes(rule.getNotes())
                 .build();
     }
 }

@@ -10,29 +10,48 @@ import lombok.Setter;
 @Setter
 public class CreateBenefitRuleRequest {
 
+    // =========================================================
+    // BASIC DETAILS
+    // =========================================================
+
     @NotBlank(message = "Rule name is required")
     private String name;
+
+    // =========================================================
+    // BENEFIT TYPE
+    // =========================================================
 
     @NotNull(message = "Benefit type is required")
     private BenefitType benefitType;
 
-    private Double rewardPointValue;
+    // =========================================================
+    // REWARD POINT CONVERSION
+    // =========================================================
+
+    // Example:
+    // 1 RP = ₹0.25
+
+    private Double rewardPointConversion;
+
+    // =========================================================
+    // REDEMPTION RULES
+    // =========================================================
 
     private Double redemptionFee;
 
     private Integer minimumRedemptionPoints;
 
+    // =========================================================
+    // EXPIRY RULES
+    // =========================================================
+
     private Boolean expiryApplicable = false;
 
     private Integer expiryMonths;
 
-    private Boolean statementCreditSupported = false;
-
-    private Boolean walletTransferSupported = false;
-
-    private Boolean travelRedemptionSupported = false;
-
-    private Boolean voucherRedemptionSupported = false;
+    // =========================================================
+    // EXTRA NOTES
+    // =========================================================
 
     private String notes;
 }

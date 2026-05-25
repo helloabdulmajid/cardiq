@@ -4,8 +4,11 @@ import in.abdulmajid.cardiq.bank.dto.BankResponse;
 import in.abdulmajid.cardiq.bank.dto.CreateBankRequest;
 import in.abdulmajid.cardiq.bank.service.BankService;
 import in.abdulmajid.cardiq.common.ApiResponse;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +18,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BankController {
 
+    // =========================================================
+    // SERVICES
+    // =========================================================
+
     private final BankService bankService;
+
+    // =========================================================
+    // CREATE NEW BANK
+    // =========================================================
 
     @PostMapping
     public ApiResponse<BankResponse> createBank(
@@ -25,9 +36,15 @@ public class BankController {
         return ApiResponse.<BankResponse>builder()
                 .success(true)
                 .message("Bank created successfully")
-                .data(bankService.createBank(request))
+                .data(
+                        bankService.createBank(request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET ALL BANKS
+    // =========================================================
 
     @GetMapping
     public ApiResponse<List<BankResponse>> getAllBanks() {
@@ -35,9 +52,15 @@ public class BankController {
         return ApiResponse.<List<BankResponse>>builder()
                 .success(true)
                 .message("Banks fetched successfully")
-                .data(bankService.getAllBanks())
+                .data(
+                        bankService.getAllBanks()
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET SINGLE BANK BY ID
+    // =========================================================
 
     @GetMapping("/{id}")
     public ApiResponse<BankResponse> getBankById(
@@ -47,9 +70,15 @@ public class BankController {
         return ApiResponse.<BankResponse>builder()
                 .success(true)
                 .message("Bank fetched successfully")
-                .data(bankService.getBankById(id))
+                .data(
+                        bankService.getBankById(id)
+                )
                 .build();
     }
+
+    // =========================================================
+    // UPDATE EXISTING BANK
+    // =========================================================
 
     @PutMapping("/{id}")
     public ApiResponse<BankResponse> updateBank(
@@ -60,9 +89,15 @@ public class BankController {
         return ApiResponse.<BankResponse>builder()
                 .success(true)
                 .message("Bank updated successfully")
-                .data(bankService.updateBank(id, request))
+                .data(
+                        bankService.updateBank(id, request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // DELETE BANK
+    // =========================================================
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteBank(
@@ -74,7 +109,6 @@ public class BankController {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message("Bank deleted successfully")
-                .data(null)
                 .build();
     }
 }

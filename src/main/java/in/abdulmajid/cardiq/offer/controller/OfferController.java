@@ -1,11 +1,16 @@
 package in.abdulmajid.cardiq.offer.controller;
 
 import in.abdulmajid.cardiq.common.ApiResponse;
+
 import in.abdulmajid.cardiq.offer.dto.CreateOfferRequest;
 import in.abdulmajid.cardiq.offer.dto.OfferResponse;
+
 import in.abdulmajid.cardiq.offer.service.OfferService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OfferController {
 
+    // =========================================================
+    // SERVICES
+    // =========================================================
+
     private final OfferService offerService;
+
+    // =========================================================
+    // CREATE OFFER
+    // =========================================================
 
     @PostMapping
     public ApiResponse<OfferResponse> createOffer(
@@ -25,9 +38,15 @@ public class OfferController {
         return ApiResponse.<OfferResponse>builder()
                 .success(true)
                 .message("Offer created successfully")
-                .data(offerService.createOffer(request))
+                .data(
+                        offerService.createOffer(request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET ALL OFFERS
+    // =========================================================
 
     @GetMapping
     public ApiResponse<List<OfferResponse>> getAllOffers() {
@@ -35,9 +54,15 @@ public class OfferController {
         return ApiResponse.<List<OfferResponse>>builder()
                 .success(true)
                 .message("Offers fetched successfully")
-                .data(offerService.getAllOffers())
+                .data(
+                        offerService.getAllOffers()
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET OFFER BY ID
+    // =========================================================
 
     @GetMapping("/{id}")
     public ApiResponse<OfferResponse> getOfferById(
@@ -47,9 +72,15 @@ public class OfferController {
         return ApiResponse.<OfferResponse>builder()
                 .success(true)
                 .message("Offer fetched successfully")
-                .data(offerService.getOfferById(id))
+                .data(
+                        offerService.getOfferById(id)
+                )
                 .build();
     }
+
+    // =========================================================
+    // UPDATE OFFER
+    // =========================================================
 
     @PutMapping("/{id}")
     public ApiResponse<OfferResponse> updateOffer(
@@ -60,9 +91,15 @@ public class OfferController {
         return ApiResponse.<OfferResponse>builder()
                 .success(true)
                 .message("Offer updated successfully")
-                .data(offerService.updateOffer(id, request))
+                .data(
+                        offerService.updateOffer(id, request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // DELETE OFFER
+    // =========================================================
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteOffer(
@@ -74,7 +111,6 @@ public class OfferController {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message("Offer deleted successfully")
-                .data(null)
                 .build();
     }
 }

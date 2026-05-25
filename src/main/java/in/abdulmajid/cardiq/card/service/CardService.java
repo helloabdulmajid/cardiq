@@ -2,16 +2,22 @@ package in.abdulmajid.cardiq.card.service;
 
 import in.abdulmajid.cardiq.bank.entity.Bank;
 import in.abdulmajid.cardiq.bank.repository.BankRepository;
+
 import in.abdulmajid.cardiq.card.dto.CardFilterRequest;
 import in.abdulmajid.cardiq.card.dto.CardResponse;
 import in.abdulmajid.cardiq.card.dto.CreateCardRequest;
+
 import in.abdulmajid.cardiq.card.entity.Card;
+
 import in.abdulmajid.cardiq.card.repository.CardRepository;
+
 import in.abdulmajid.cardiq.card.specification.CardSpecification;
+
 import in.abdulmajid.cardiq.exception.DuplicateResourceException;
 import in.abdulmajid.cardiq.exception.ResourceNotFoundException;
-import in.abdulmajid.cardiq.offer.repository.OfferRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,33 +26,79 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardService {
 
+    // =========================================================
+    // REPOSITORIES
+    // =========================================================
+
     private final CardRepository cardRepository;
+
     private final BankRepository bankRepository;
-    private final OfferRepository offerRepository;
+
+    // =========================================================
+    // CREATE CARD
+    // =========================================================
 
     public CardResponse createCard(
             CreateCardRequest request
     ) {
 
+        // -----------------------------------------------------
+        // CHECK DUPLICATE CARD NAME
+        // -----------------------------------------------------
+
         if (cardRepository.existsByNameIgnoreCase(request.getName())) {
-            throw new DuplicateResourceException("Card already exists");
+
+            throw new DuplicateResourceException(
+                    "Card already exists"
+            );
         }
+
+        // -----------------------------------------------------
+        // CHECK DUPLICATE CARD SLUG
+        // -----------------------------------------------------
+
+        if (cardRepository.existsBySlug(request.getSlug())) {
+
+            throw new DuplicateResourceException(
+                    "Card slug already exists"
+            );
+        }
+
+        // -----------------------------------------------------
+        // FIND BANK
+        // -----------------------------------------------------
 
         Bank bank = bankRepository.findById(request.getBankId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Bank not found")
+                        new ResourceNotFoundException(
+                                "Bank not found"
+                        )
                 );
+
+        // -----------------------------------------------------
+        // CREATE CARD OBJECT
+        // -----------------------------------------------------
 
         Card card = new Card();
 
-        mapRequestToEntity(card, request);
+        mapRequestToEntity(card, request, bank);
 
-        card.setBank(bank);
+        // -----------------------------------------------------
+        // SAVE CARD
+        // -----------------------------------------------------
 
         Card savedCard = cardRepository.save(card);
 
+        // -----------------------------------------------------
+        // RETURN RESPONSE
+        // -----------------------------------------------------
+
         return mapToResponse(savedCard);
     }
+
+    // =========================================================
+    // GET ALL CARDS
+    // =========================================================
 
     public List<CardResponse> getAllCards() {
 
@@ -55,6 +107,27 @@ public class CardService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    // =========================================================
+    // GET CARD BY ID
+    // =========================================================
+
+    public CardResponse getCardById(Long id) {
+
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Card not found"
+                        )
+                );
+
+        return mapToResponse(card);
+    }
+
+    // =========================================================
+    // FILTER CARDS
+    // =========================================================
+
     public List<CardResponse> filterCards(
             CardFilterRequest filter
     ) {
@@ -67,76 +140,167 @@ public class CardService {
                 .toList();
     }
 
-    public CardResponse getCardById(Long id) {
-
-        Card card = cardRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Card not found")
-                );
-
-        return mapToResponse(card);
-    }
+    // =========================================================
+    // UPDATE CARD
+    // =========================================================
 
     public CardResponse updateCard(
             Long id,
             CreateCardRequest request
     ) {
 
+        // -----------------------------------------------------
+        // FIND EXISTING CARD
+        // -----------------------------------------------------
+
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Card not found")
+                        new ResourceNotFoundException(
+                                "Card not found"
+                        )
                 );
+
+        // -----------------------------------------------------
+        // FIND BANK
+        // -----------------------------------------------------
 
         Bank bank = bankRepository.findById(request.getBankId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Bank not found")
+                        new ResourceNotFoundException(
+                                "Bank not found"
+                        )
                 );
 
-        mapRequestToEntity(card, request);
+        // -----------------------------------------------------
+        // UPDATE CARD DATA
+        // -----------------------------------------------------
 
-        card.setBank(bank);
+        mapRequestToEntity(card, request, bank);
+
+        // -----------------------------------------------------
+        // SAVE UPDATED CARD
+        // -----------------------------------------------------
 
         Card updatedCard = cardRepository.save(card);
+
+        // -----------------------------------------------------
+        // RETURN RESPONSE
+        // -----------------------------------------------------
 
         return mapToResponse(updatedCard);
     }
 
+    // =========================================================
+    // DELETE CARD
+    // =========================================================
+
     public void deleteCard(Long id) {
+
+        // -----------------------------------------------------
+        // FIND CARD
+        // -----------------------------------------------------
 
         Card card = cardRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Card not found")
+                        new ResourceNotFoundException(
+                                "Card not found"
+                        )
                 );
 
-        if (offerRepository.existsByCard_Id(id)) {
-            throw new DuplicateResourceException(
-                    "Cannot delete card because offers are associated with it"
-            );
-        }
+        // -----------------------------------------------------
+        // DELETE CARD
+        // -----------------------------------------------------
 
         cardRepository.delete(card);
     }
 
+    // =========================================================
+    // MAP REQUEST DTO TO ENTITY
+    // =========================================================
+
     private void mapRequestToEntity(
             Card card,
-            CreateCardRequest request
+            CreateCardRequest request,
+            Bank bank
     ) {
 
+        // -----------------------------------------------------
+        // BASIC CARD DETAILS
+        // -----------------------------------------------------
+
         card.setName(request.getName());
+
+        card.setSlug(request.getSlug());
+
+        card.setDescription(request.getDescription());
+
+        card.setImageUrl(request.getImageUrl());
+
+        card.setActive(
+                request.getActive() != null
+                        ? request.getActive()
+                        : true
+        );
+
+        card.setLtf(
+                request.getLtf() != null
+                        ? request.getLtf()
+                        : false
+        );
+
+        // -----------------------------------------------------
+        // CARD FEES
+        // -----------------------------------------------------
 
         card.setJoiningFee(request.getJoiningFee());
 
         card.setAnnualFee(request.getAnnualFee());
 
+        card.setForexMarkup(request.getForexMarkup());
+
+        // -----------------------------------------------------
+        // CARD CLASSIFICATION
+        // -----------------------------------------------------
+
         card.setNetwork(request.getNetwork());
 
         card.setCardType(request.getCardType());
 
-        card.setRewardType(request.getRewardType());
-
         card.setCardLevel(request.getCardLevel());
 
-        card.setLtf(request.getLtf());
+        card.setRewardType(request.getRewardType());
+
+        card.setRewardValueType(
+                request.getRewardValueType()
+        );
+
+        // -----------------------------------------------------
+        // REWARD DETAILS
+        // -----------------------------------------------------
+
+        card.setBaseRewardValue(
+                request.getBaseRewardValue()
+        );
+
+        card.setRewardPointConversion(
+                request.getRewardPointConversion()
+        );
+
+        card.setRewardPointExpiryMonths(
+                request.getRewardPointExpiryMonths()
+        );
+
+        // -----------------------------------------------------
+        // CARD FEATURES
+        // -----------------------------------------------------
+
+        card.setEmiAvailable(
+                request.getEmiAvailable()
+        );
+
+        card.setFuelSurchargeWaiver(
+                request.getFuelSurchargeWaiver()
+        );
 
         card.setAirportLoungeAccess(
                 request.getAirportLoungeAccess()
@@ -146,74 +310,203 @@ public class CardService {
                 request.getRailwayLoungeAccess()
         );
 
-        card.setFuelSurchargeWaiver(
-                request.getFuelSurchargeWaiver()
+        card.setAddOnCardAvailable(
+                request.getAddOnCardAvailable()
         );
+
+        card.setContactlessEnabled(
+                request.getContactlessEnabled()
+        );
+
+        // -----------------------------------------------------
+        // LOUNGE ACCESS DETAILS
+        // -----------------------------------------------------
+
+        card.setDomesticLoungeAccess(
+                request.getDomesticLoungeAccess()
+        );
+
+        card.setInternationalLoungeAccess(
+                request.getInternationalLoungeAccess()
+        );
+
+        card.setDomesticLoungePeriod(
+                request.getDomesticLoungePeriod()
+        );
+
+        card.setInternationalLoungePeriod(
+                request.getInternationalLoungePeriod()
+        );
+
+        // -----------------------------------------------------
+        // CO-BRANDED DETAILS
+        // -----------------------------------------------------
 
         card.setCoBranded(
                 request.getCoBranded()
-        );
-
-        card.setEmiAvailable(
-                request.getEmiAvailable()
-        );
-
-        card.setRewardRate(
-                request.getRewardRate()
-        );
-
-        card.setDescription(
-                request.getDescription()
-        );
-        card.setActive(
-                request.getActive()
         );
 
         card.setCoBrandPartner(
                 request.getCoBrandPartner()
         );
 
-        card.setImageUrl(
-                request.getImageUrl()
+        // -----------------------------------------------------
+        // ELIGIBILITY
+        // -----------------------------------------------------
+
+        card.setMinimumIncomeRequired(
+                request.getMinimumIncomeRequired()
         );
+
+        // -----------------------------------------------------
+        // RELATIONS
+        // -----------------------------------------------------
+
+        card.setBank(bank);
     }
+
+    // =========================================================
+    // MAP ENTITY TO RESPONSE DTO
+    // =========================================================
 
     private CardResponse mapToResponse(
             Card card
     ) {
 
         return CardResponse.builder()
+
+                // -------------------------------------------------
+                // BASIC CARD DETAILS
+                // -------------------------------------------------
+
                 .id(card.getId())
+
                 .name(card.getName())
-                .bankName(card.getBank().getName())
-                .network(card.getNetwork())
-                .cardType(card.getCardType())
-                .rewardType(card.getRewardType())
-                .cardLevel(card.getCardLevel())
-                .joiningFee(card.getJoiningFee())
-                .annualFee(card.getAnnualFee())
+
+                .slug(card.getSlug())
+
+                .description(card.getDescription())
+
+                .imageUrl(card.getImageUrl())
+
+                .active(card.getActive())
+
                 .ltf(card.getLtf())
-                .airportLoungeAccess(
-                        card.getAirportLoungeAccess()
+
+                // -------------------------------------------------
+                // BANK DETAILS
+                // -------------------------------------------------
+
+                .bankName(
+                        card.getBank() != null
+                                ? card.getBank().getName()
+                                : null
                 )
-                .railwayLoungeAccess(
-                        card.getRailwayLoungeAccess()
+
+                // -------------------------------------------------
+                // CARD CLASSIFICATION
+                // -------------------------------------------------
+
+                .network(card.getNetwork())
+
+                .cardType(card.getCardType())
+
+                .rewardType(card.getRewardType())
+
+                .cardLevel(card.getCardLevel())
+
+                .rewardValueType(
+                        card.getRewardValueType()
                 )
+
+                // -------------------------------------------------
+                // CARD FEES
+                // -------------------------------------------------
+
+                .joiningFee(card.getJoiningFee())
+
+                .annualFee(card.getAnnualFee())
+
+                .forexMarkup(card.getForexMarkup())
+
+                // -------------------------------------------------
+                // REWARD DETAILS
+                // -------------------------------------------------
+
+                .baseRewardValue(
+                        card.getBaseRewardValue()
+                )
+
+                .rewardPointConversion(
+                        card.getRewardPointConversion()
+                )
+
+                .rewardPointExpiryMonths(
+                        card.getRewardPointExpiryMonths()
+                )
+
+                // -------------------------------------------------
+                // CARD FEATURES
+                // -------------------------------------------------
+
+                .emiAvailable(card.getEmiAvailable())
+
                 .fuelSurchargeWaiver(
                         card.getFuelSurchargeWaiver()
                 )
+
+                .airportLoungeAccess(
+                        card.getAirportLoungeAccess()
+                )
+
+                .railwayLoungeAccess(
+                        card.getRailwayLoungeAccess()
+                )
+
+                .addOnCardAvailable(
+                        card.getAddOnCardAvailable()
+                )
+
+                .contactlessEnabled(
+                        card.getContactlessEnabled()
+                )
+
+                // -------------------------------------------------
+                // LOUNGE ACCESS DETAILS
+                // -------------------------------------------------
+
+                .domesticLoungeAccess(
+                        card.getDomesticLoungeAccess()
+                )
+
+                .internationalLoungeAccess(
+                        card.getInternationalLoungeAccess()
+                )
+
+                .domesticLoungePeriod(
+                        card.getDomesticLoungePeriod()
+                )
+
+                .internationalLoungePeriod(
+                        card.getInternationalLoungePeriod()
+                )
+
+                // -------------------------------------------------
+                // CO-BRANDED DETAILS
+                // -------------------------------------------------
+
                 .coBranded(card.getCoBranded())
-                .emiAvailable(card.getEmiAvailable())
-                .rewardRate(card.getRewardRate())
-                .description(card.getDescription())
-                .active(card.getActive())
 
                 .coBrandPartner(
                         card.getCoBrandPartner()
                 )
 
-                .imageUrl(
-                        card.getImageUrl()
+                // -------------------------------------------------
+                // ELIGIBILITY
+                // -------------------------------------------------
+
+                .minimumIncomeRequired(
+                        card.getMinimumIncomeRequired()
                 )
 
                 .build();

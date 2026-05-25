@@ -3,24 +3,13 @@ package in.abdulmajid.cardiq.benefit.enums;
 public enum BenefitType {
 
     REAL_CASHBACK,
-
     STATEMENT_CREDIT,
-
-    WALLET_CASHBACK,
-
+    WALLET_BALANCE,
     REWARD_POINTS,
-
-    AIR_MILES,
-
-    INSTANT_DISCOUNT,
-
+    AIRLINE_MILES,
+    HOTEL_POINTS,
     VOUCHER,
-
-    MILESTONE_REWARD,
-
-    LOUNGE_ACCESS,
-
-    FUEL_WAIVER,
-
-    EMI_BENEFIT
+    CASHPOINTS,
+    EDGE_REWARDS,
+    MILESTONE_REWARD
 }

@@ -1,14 +1,17 @@
 package in.abdulmajid.cardiq.card.dto;
 
-import in.abdulmajid.cardiq.card.enums.CardNetwork;
-import in.abdulmajid.cardiq.card.enums.CardType;
-import in.abdulmajid.cardiq.card.enums.RewardType;
+import in.abdulmajid.cardiq.card.enums.*;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class CardFilterRequest {
+
+    // =========================================================
+    // CARD FEATURES
+    // =========================================================
 
     private Boolean ltf;
 
@@ -18,11 +21,25 @@ public class CardFilterRequest {
 
     private Boolean fuelSurchargeWaiver;
 
+    private Boolean coBranded;
+
+    // =========================================================
+    // CARD CLASSIFICATION
+    // =========================================================
+
     private CardNetwork network;
 
     private CardType cardType;
 
     private RewardType rewardType;
 
+    private CardLevel cardLevel;
+
+    // =========================================================
+    // CARD FEES
+    // =========================================================
+
     private Double maxAnnualFee;
+
+    private Double maxForexMarkup;
 }

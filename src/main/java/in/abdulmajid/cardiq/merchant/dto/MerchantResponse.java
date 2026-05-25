@@ -1,6 +1,5 @@
 package in.abdulmajid.cardiq.merchant.dto;
 
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,15 +7,33 @@ import lombok.Getter;
 @Builder
 public class MerchantResponse {
 
+    // =========================================================
+    // BASIC DETAILS
+    // =========================================================
+
     private Long id;
 
     private String name;
 
+    private String slug;
+
+    private String code;
+
+    private String merchantType;
+
+    // =========================================================
+    // VISUAL DETAILS
+    // =========================================================
+
     private String logoUrl;
 
     private String websiteUrl;
-    @Column(length = 1000)
+
+    // =========================================================
+    // EXTRA DETAILS
+    // =========================================================
+
     private String description;
 
-    private Boolean active = true;
+    private Boolean active;
 }

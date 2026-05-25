@@ -1,12 +1,16 @@
 package in.abdulmajid.cardiq.offer.dto;
 
 import in.abdulmajid.cardiq.card.enums.CardNetwork;
-import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
+
+import in.abdulmajid.cardiq.common.enums.BenefitPeriod;
+
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +19,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CreateOfferRequest {
+
+    // =========================================================
+    // BASIC OFFER DETAILS
+    // =========================================================
 
     @NotBlank(message = "Offer title is required")
     private String title;
@@ -28,13 +36,24 @@ public class CreateOfferRequest {
     @Min(value = 0, message = "Offer value cannot be negative")
     private Double value;
 
+    private Boolean active = true;
+
+    // =========================================================
+    // BENEFIT DETAILS
+    // =========================================================
+
     @Min(value = 0, message = "Maximum benefit cannot be negative")
     private Double maxBenefit;
 
     @Min(value = 0, message = "Minimum spend cannot be negative")
     private Double minimumSpend;
 
-    private Boolean active = true;
+    @Min(value = 0, message = "Cashback cap cannot be negative")
+    private Double cashbackCap;
+
+    // =========================================================
+    // DATE DETAILS
+    // =========================================================
 
     @NotNull(message = "Start date is required")
     private LocalDate startDate;
@@ -44,7 +63,51 @@ public class CreateOfferRequest {
 
     private LocalDate verifiedAt;
 
+    // =========================================================
+    // SOURCE DETAILS
+    // =========================================================
+
     private String sourceUrl;
+
+    // =========================================================
+    // PLATFORM DETAILS
+    // =========================================================
+
+    @NotNull(message = "Offer platform is required")
+    private OfferPlatform platform;
+
+    @NotNull(message = "Benefit period is required")
+    private BenefitPeriod benefitPeriod;
+
+    private CardNetwork applicableNetwork;
+
+    // =========================================================
+    // SPECIAL CONDITIONS
+    // =========================================================
+
+    private Boolean weekendOnly = false;
+
+    private Boolean onlineOnly = false;
+
+    private Boolean requiresMembership = false;
+
+    private String excludedMerchants;
+
+    // =========================================================
+    // EXTRA OFFER DETAILS
+    // =========================================================
+
+    private String milestoneBenefit;
+
+    private Boolean limitedTimeOffer = false;
+
+    private Integer priority = 0;
+
+    private Boolean permanentOffer = false;
+
+    // =========================================================
+    // RELATIONS
+    // =========================================================
 
     @NotNull(message = "Card ID is required")
     private Long cardId;
@@ -55,21 +118,6 @@ public class CreateOfferRequest {
     @NotNull(message = "Category ID is required")
     private Long categoryId;
 
-    @NotNull(message = "Offer platform is required")
-    private OfferPlatform platform;
-
-    @NotNull(message = "Benefit period is required")
-    private BenefitPeriod benefitPeriod;
-
-    private CardNetwork applicableNetwork;
-
-    private String milestoneBenefit;
-
-    private Boolean limitedTimeOffer = false;
-
-    private Integer priority = 0;
-
-    private Boolean permanentOffer = false;
     @NotNull(message = "Benefit rule ID is required")
     private Long benefitRuleId;
 }

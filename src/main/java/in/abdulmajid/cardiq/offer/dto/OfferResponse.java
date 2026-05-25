@@ -1,10 +1,15 @@
 package in.abdulmajid.cardiq.offer.dto;
 
 import in.abdulmajid.cardiq.benefit.enums.BenefitType;
+
 import in.abdulmajid.cardiq.card.enums.CardNetwork;
-import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
+
+import in.abdulmajid.cardiq.common.enums.BenefitPeriod;
+
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
+import in.abdulmajid.cardiq.benefit.enums.BenefitType;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,6 +18,10 @@ import java.time.LocalDate;
 @Getter
 @Builder
 public class OfferResponse {
+
+    // =========================================================
+    // BASIC OFFER DETAILS
+    // =========================================================
 
     private Long id;
 
@@ -24,11 +33,21 @@ public class OfferResponse {
 
     private Double value;
 
+    private Boolean active;
+
+    // =========================================================
+    // BENEFIT DETAILS
+    // =========================================================
+
     private Double maxBenefit;
 
     private Double minimumSpend;
 
-    private Boolean active;
+    private Double cashbackCap;
+
+    // =========================================================
+    // DATE DETAILS
+    // =========================================================
 
     private LocalDate startDate;
 
@@ -36,7 +55,15 @@ public class OfferResponse {
 
     private LocalDate verifiedAt;
 
+    // =========================================================
+    // SOURCE DETAILS
+    // =========================================================
+
     private String sourceUrl;
+
+    // =========================================================
+    // RELATION DETAILS
+    // =========================================================
 
     private String cardName;
 
@@ -44,11 +71,31 @@ public class OfferResponse {
 
     private String categoryName;
 
+    // =========================================================
+    // PLATFORM DETAILS
+    // =========================================================
+
     private OfferPlatform platform;
 
     private BenefitPeriod benefitPeriod;
 
     private CardNetwork applicableNetwork;
+
+    // =========================================================
+    // SPECIAL CONDITIONS
+    // =========================================================
+
+    private Boolean weekendOnly;
+
+    private Boolean onlineOnly;
+
+    private Boolean requiresMembership;
+
+    private String excludedMerchants;
+
+    // =========================================================
+    // EXTRA OFFER DETAILS
+    // =========================================================
 
     private String milestoneBenefit;
 
@@ -57,6 +104,11 @@ public class OfferResponse {
     private Integer priority;
 
     private Boolean permanentOffer;
+
+    // =========================================================
+    // BENEFIT RULE DETAILS
+    // =========================================================
+
     private String benefitRuleName;
 
     private BenefitType benefitType;

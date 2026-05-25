@@ -3,7 +3,13 @@ package in.abdulmajid.cardiq.offer.enums;
 public enum OfferPlatform {
 
     ONLINE,
+
     OFFLINE,
-    BOTH,
-    UPI
+
+    UPI,
+
+    ALL,
+    DINING,
+    TRAVEL_PORTAL,
+    EMI
 }

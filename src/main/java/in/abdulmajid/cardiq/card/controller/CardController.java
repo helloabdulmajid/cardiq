@@ -4,9 +4,13 @@ import in.abdulmajid.cardiq.card.dto.CardFilterRequest;
 import in.abdulmajid.cardiq.card.dto.CardResponse;
 import in.abdulmajid.cardiq.card.dto.CreateCardRequest;
 import in.abdulmajid.cardiq.card.service.CardService;
+
 import in.abdulmajid.cardiq.common.ApiResponse;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +20,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CardController {
 
+    // =========================================================
+    // SERVICES
+    // =========================================================
+
     private final CardService cardService;
+
+    // =========================================================
+    // CREATE NEW CARD
+    // =========================================================
 
     @PostMapping
     public ApiResponse<CardResponse> createCard(
@@ -26,9 +38,15 @@ public class CardController {
         return ApiResponse.<CardResponse>builder()
                 .success(true)
                 .message("Card created successfully")
-                .data(cardService.createCard(request))
+                .data(
+                        cardService.createCard(request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET ALL CARDS
+    // =========================================================
 
     @GetMapping
     public ApiResponse<List<CardResponse>> getAllCards() {
@@ -36,9 +54,15 @@ public class CardController {
         return ApiResponse.<List<CardResponse>>builder()
                 .success(true)
                 .message("Cards fetched successfully")
-                .data(cardService.getAllCards())
+                .data(
+                        cardService.getAllCards()
+                )
                 .build();
     }
+
+    // =========================================================
+    // FILTER CARDS
+    // =========================================================
 
     @PostMapping("/filter")
     public ApiResponse<List<CardResponse>> filterCards(
@@ -48,9 +72,15 @@ public class CardController {
         return ApiResponse.<List<CardResponse>>builder()
                 .success(true)
                 .message("Filtered cards fetched successfully")
-                .data(cardService.filterCards(filter))
+                .data(
+                        cardService.filterCards(filter)
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET SINGLE CARD BY ID
+    // =========================================================
 
     @GetMapping("/{id}")
     public ApiResponse<CardResponse> getCardById(
@@ -60,9 +90,15 @@ public class CardController {
         return ApiResponse.<CardResponse>builder()
                 .success(true)
                 .message("Card fetched successfully")
-                .data(cardService.getCardById(id))
+                .data(
+                        cardService.getCardById(id)
+                )
                 .build();
     }
+
+    // =========================================================
+    // UPDATE EXISTING CARD
+    // =========================================================
 
     @PutMapping("/{id}")
     public ApiResponse<CardResponse> updateCard(
@@ -73,9 +109,15 @@ public class CardController {
         return ApiResponse.<CardResponse>builder()
                 .success(true)
                 .message("Card updated successfully")
-                .data(cardService.updateCard(id, request))
+                .data(
+                        cardService.updateCard(id, request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // DELETE CARD
+    // =========================================================
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteCard(
@@ -87,7 +129,6 @@ public class CardController {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message("Card deleted successfully")
-                .data(null)
                 .build();
     }
 }

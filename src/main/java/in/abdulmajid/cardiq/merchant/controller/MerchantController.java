@@ -1,11 +1,15 @@
 package in.abdulmajid.cardiq.merchant.controller;
 
 import in.abdulmajid.cardiq.common.ApiResponse;
+
 import in.abdulmajid.cardiq.merchant.dto.CreateMerchantRequest;
 import in.abdulmajid.cardiq.merchant.dto.MerchantResponse;
 import in.abdulmajid.cardiq.merchant.service.MerchantService;
+
 import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MerchantController {
 
+    // =========================================================
+    // SERVICES
+    // =========================================================
+
     private final MerchantService merchantService;
+
+    // =========================================================
+    // CREATE NEW MERCHANT
+    // =========================================================
 
     @PostMapping
     public ApiResponse<MerchantResponse> createMerchant(
@@ -25,9 +37,15 @@ public class MerchantController {
         return ApiResponse.<MerchantResponse>builder()
                 .success(true)
                 .message("Merchant created successfully")
-                .data(merchantService.createMerchant(request))
+                .data(
+                        merchantService.createMerchant(request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET ALL MERCHANTS
+    // =========================================================
 
     @GetMapping
     public ApiResponse<List<MerchantResponse>> getAllMerchants() {
@@ -35,9 +53,15 @@ public class MerchantController {
         return ApiResponse.<List<MerchantResponse>>builder()
                 .success(true)
                 .message("Merchants fetched successfully")
-                .data(merchantService.getAllMerchants())
+                .data(
+                        merchantService.getAllMerchants()
+                )
                 .build();
     }
+
+    // =========================================================
+    // GET SINGLE MERCHANT BY ID
+    // =========================================================
 
     @GetMapping("/{id}")
     public ApiResponse<MerchantResponse> getMerchantById(
@@ -47,9 +71,15 @@ public class MerchantController {
         return ApiResponse.<MerchantResponse>builder()
                 .success(true)
                 .message("Merchant fetched successfully")
-                .data(merchantService.getMerchantById(id))
+                .data(
+                        merchantService.getMerchantById(id)
+                )
                 .build();
     }
+
+    // =========================================================
+    // UPDATE EXISTING MERCHANT
+    // =========================================================
 
     @PutMapping("/{id}")
     public ApiResponse<MerchantResponse> updateMerchant(
@@ -60,9 +90,15 @@ public class MerchantController {
         return ApiResponse.<MerchantResponse>builder()
                 .success(true)
                 .message("Merchant updated successfully")
-                .data(merchantService.updateMerchant(id, request))
+                .data(
+                        merchantService.updateMerchant(id, request)
+                )
                 .build();
     }
+
+    // =========================================================
+    // DELETE MERCHANT
+    // =========================================================
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> deleteMerchant(
@@ -74,7 +110,6 @@ public class MerchantController {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message("Merchant deleted successfully")
-                .data(null)
                 .build();
     }
 }

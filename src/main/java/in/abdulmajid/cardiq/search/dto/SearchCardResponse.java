@@ -1,6 +1,7 @@
 package in.abdulmajid.cardiq.search.dto;
 
 import in.abdulmajid.cardiq.benefit.enums.BenefitType;
+import in.abdulmajid.cardiq.card.enums.RewardType;
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
 import lombok.Builder;
@@ -12,9 +13,41 @@ import java.util.List;
 @Builder
 public class SearchCardResponse {
 
+    // =========================================================
+    // CARD DETAILS
+    // =========================================================
+
     private String cardName;
 
     private String bankName;
+
+    private String imageUrl;
+
+    private String network;
+
+    private RewardType rewardType;
+
+    private String cardLevel;
+
+    private Boolean ltf;
+
+    private Double annualFee;
+
+    private Double joiningFee;
+
+    private Double forexMarkup;
+
+    private Boolean airportLoungeAccess;
+
+    private Integer domesticLoungeAccess;
+
+    private Integer internationalLoungeAccess;
+
+    private String coBrandPartner;
+
+    // =========================================================
+    // OFFER DETAILS
+    // =========================================================
 
     private String offerTitle;
 
@@ -27,33 +60,48 @@ public class SearchCardResponse {
     private String categoryName;
 
     private OfferPlatform platform;
-    private String imageUrl;
 
-    private String network;
-
-    private String rewardType;
     private Boolean permanentOffer;
 
     private Boolean limitedTimeOffer;
 
     private Integer priority;
-    private String benefitType;
+
+    // =========================================================
+    // BENEFIT DETAILS
+    // =========================================================
+
+    private BenefitType benefitType;
+
+    private String benefitRuleName;
+
+    private String benefitSummary;
+
+    private Double cashbackCap;
+
+    private Double minimumSpend;
+
+    private Double maxBenefit;
+
+    private Double estimatedSavings;
+
+    // =========================================================
+    // SEARCH ANALYTICS
+    // =========================================================
 
     private Integer recommendationScore;
-    private String benefitRuleName;
-    private String benefitSummary;
-    private Double estimatedSavings;
+
     private List<String> matchedKeywords;
 
     private List<String> unmatchedKeywords;
 
     private Integer matchedKeywordCount;
+
     private Double matchPercentage;
+
     private List<String> suggestedKeywords;
 
-    private Boolean fuzzyMatched;
-
     private String searchMessage;
-    private Boolean exactMatch;
 
+    private Boolean exactMatch;
 }

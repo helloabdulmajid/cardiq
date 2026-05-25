@@ -1,15 +1,22 @@
 package in.abdulmajid.cardiq.offer.entity;
 
 import in.abdulmajid.cardiq.benefit.entity.BenefitRule;
+
 import in.abdulmajid.cardiq.card.entity.Card;
 import in.abdulmajid.cardiq.card.enums.CardNetwork;
+
 import in.abdulmajid.cardiq.category.entity.Category;
+
 import in.abdulmajid.cardiq.common.BaseEntity;
+import in.abdulmajid.cardiq.common.enums.BenefitPeriod;
+
 import in.abdulmajid.cardiq.merchant.entity.Merchant;
-import in.abdulmajid.cardiq.offer.enums.BenefitPeriod;
+
 import in.abdulmajid.cardiq.offer.enums.OfferPlatform;
 import in.abdulmajid.cardiq.offer.enums.OfferType;
+
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +27,11 @@ import java.time.LocalDate;
 @Entity
 public class Offer extends BaseEntity {
 
-    @Column(nullable = false,length = 255)
+    // =========================================================
+    // BASIC OFFER DETAILS
+    // =========================================================
+
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Column(length = 2000)
@@ -29,13 +40,36 @@ public class Offer extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private OfferType offerType;
 
+    // Example:
+    // 5 = 5%
+    // 10 = 10%
+
     private Double value;
+
+    private Boolean active = true;
+
+    // =========================================================
+    // BENEFIT DETAILS
+    // =========================================================
+
+    // Example:
+    // Max cashback ₹500
 
     private Double maxBenefit;
 
+    // Example:
+    // Minimum spend ₹2000
+
     private Double minimumSpend;
 
-    private Boolean active = true;
+    // Example:
+    // Monthly cashback cap ₹1000
+
+    private Double cashbackCap;
+
+    // =========================================================
+    // DATE DETAILS
+    // =========================================================
 
     private LocalDate startDate;
 
@@ -43,16 +77,15 @@ public class Offer extends BaseEntity {
 
     private LocalDate verifiedAt;
 
+    // =========================================================
+    // SOURCE DETAILS
+    // =========================================================
+
     private String sourceUrl;
 
-    @ManyToOne
-    private Card card;
-
-    @ManyToOne
-    private Merchant merchant;
-
-    @ManyToOne
-    private Category category;
+    // =========================================================
+    // PLATFORM DETAILS
+    // =========================================================
 
     @Enumerated(EnumType.STRING)
     private OfferPlatform platform;
@@ -63,11 +96,44 @@ public class Offer extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CardNetwork applicableNetwork;
 
+    // =========================================================
+    // SPECIAL CONDITIONS
+    // =========================================================
+
+    private Boolean weekendOnly = false;
+
+    private Boolean onlineOnly = false;
+
+    private Boolean requiresMembership = false;
+
+    @Column(length = 1000)
+    private String excludedMerchants;
+
+    // =========================================================
+    // EXTRA OFFER DETAILS
+    // =========================================================
+
     @Column(length = 1000)
     private String milestoneBenefit;
+
     private Boolean limitedTimeOffer = false;
+
     private Integer priority = 0;
+
     private Boolean permanentOffer = false;
+
+    // =========================================================
+    // RELATIONS
+    // =========================================================
+
+    @ManyToOne
+    private Card card;
+
+    @ManyToOne
+    private Merchant merchant;
+
+    @ManyToOne
+    private Category category;
 
     @ManyToOne
     private BenefitRule benefitRule;

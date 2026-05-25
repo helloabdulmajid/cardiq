@@ -1,11 +1,18 @@
 package in.abdulmajid.cardiq.search.service;
+import in.abdulmajid.cardiq.common.enums.BenefitPeriod;
 
 import in.abdulmajid.cardiq.benefit.enums.BenefitType;
+
+
 import in.abdulmajid.cardiq.exception.ResourceNotFoundException;
+
 import in.abdulmajid.cardiq.offer.entity.Offer;
 import in.abdulmajid.cardiq.offer.repository.OfferRepository;
+
 import in.abdulmajid.cardiq.search.dto.SearchCardResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,20 +20,63 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import static in.abdulmajid.cardiq.benefit.enums.BenefitType.REAL_CASHBACK;
+import static in.abdulmajid.cardiq.offer.enums.OfferType.LOUNGE_ACCESS;
+
 @Service
 @RequiredArgsConstructor
 public class SearchService {
 
+    // =========================================================
+    // REPOSITORIES
+    // =========================================================
+
     private final OfferRepository offerRepository;
+
+    // =========================================================
+    // KEYWORD NORMALIZATION
+    // =========================================================
+
+    private static final Map<String, String>
+            NORMALIZED_KEYWORDS = Map.ofEntries(
+
+            Map.entry("travl", "travel"),
+            Map.entry("travels", "travel"),
+            Map.entry("traveling", "travel"),
+            Map.entry("travelling", "travel"),
+
+            Map.entry("amazn", "amazon"),
+            Map.entry("amzn", "amazon"),
+
+            Map.entry("flpkrt", "flipkart"),
+            Map.entry("flipkrt", "flipkart"),
+            Map.entry("flepkrt", "flipkart"),
+
+            Map.entry("swigy", "swiggy"),
+            Map.entry("swegy", "swiggy"),
+
+            Map.entry("zomoto", "zomato"),
+            Map.entry("zoomat", "zomato"),
+
+            Map.entry("shoping", "shopping"),
+            Map.entry("shooping", "shopping"),
+
+            Map.entry("fods", "food"),
+            Map.entry("fod", "food")
+    );
+
+    // =========================================================
+    // SEARCH
+    // =========================================================
 
     public List<SearchCardResponse> search(
             String keyword,
             Double amount
     ) {
 
-        /*
-         * Validate search keyword
-         */
+        // -----------------------------------------------------
+        // VALIDATE KEYWORD
+        // -----------------------------------------------------
 
         if (keyword == null || keyword.isBlank()) {
 
@@ -35,44 +85,29 @@ public class SearchService {
             );
         }
 
-
-        /*
-         * Split keywords
-         *
-         * Example:
-         * "amazon cashback"
-         *
-         * becomes:
-         *
-         * ["amazon", "cashback"]
-         */
+        // -----------------------------------------------------
+        // SPLIT KEYWORDS
+        // -----------------------------------------------------
 
         List<String> keywords =
                 List.of(
                         keyword
                                 .toLowerCase()
+                                .trim()
                                 .split("\\s+")
                 );
 
-
-        /*
-         * Fetch all active offers
-         */
+        // -----------------------------------------------------
+        // FETCH ACTIVE OFFERS
+        // -----------------------------------------------------
 
         List<SearchCardResponse> results =
+
                 offerRepository
                         .findByActiveTrue()
                         .stream()
 
                         .map(offer -> {
-
-                            /*
-                             * Relevance score
-                             *
-                             * Measures:
-                             * how closely offer matches
-                             * user search intent
-                             */
 
                             int relevanceScore = 0;
 
@@ -87,68 +122,25 @@ public class SearchService {
 
                             boolean exactMatch = true;
 
+                            // =====================================
+                            // KEYWORD MATCHING
+                            // =====================================
 
+                            for (String originalWord : keywords) {
 
-
-                            /*
-                             * Validate keyword matching
-                             *
-                             * All keywords must match
-                             * somewhere
-                             */
-                            /*
-                             * Keyword normalization
-                             * and typo suggestions
-                             */
-
-                            Map<String, String> normalizedKeywords =
-                                    Map.ofEntries(
-
-                                            Map.entry("travl", "travel"),
-                                            Map.entry("travels", "travel"),
-                                            Map.entry("traveling", "travel"),
-                                            Map.entry("travelling", "travel"),
-
-                                            Map.entry("amazn", "amazon"),
-                                            Map.entry("amzn", "amazon"),
-                                            Map.entry("flpkrt", "flipkart"),
-                                            Map.entry("flepkrt", "flipkart"),
-                                            Map.entry("flpcart", "flipkart"),
-
-                                            Map.entry("flipkrt", "flipkart"),
-                                            Map.entry("swigy", "swiggy"),
-                                            Map.entry("swegy", "swiggy"),
-                                            Map.entry("sweegy", "swiggy"),
-                                            Map.entry("suegy", "swiggy"),
-                                            Map.entry("eternal", "zomato"),
-                                            Map.entry("zomoto", "zomato"),
-                                            Map.entry("zoomat", "zomato"),
-
-                                            Map.entry("zomat", "zomato"),
-
-                                            Map.entry("foods", "food"),
-                                            Map.entry("fods", "food"),
-                                            Map.entry("fod", "food"),
-                                            Map.entry("shoping", "shopping"),
-                                            Map.entry("shooping", "shopping"),
-                                            Map.entry("swoping", "shopping"),
-                                            Map.entry("shoppingg", "shopping")
-                                    );
-
-                            for (String originalWord  : keywords)
-                            {
                                 String word =
-                                        normalizedKeywords.getOrDefault(
-                                                originalWord,
-                                                originalWord
-                                        );
+                                        NORMALIZED_KEYWORDS
+                                                .getOrDefault(
+                                                        originalWord,
+                                                        originalWord
+                                                );
 
-                                /*
-                                 * Add suggestion
-                                 * only when corrected
-                                 */
+                                // ---------------------------------
+                                // TYPO SUGGESTION
+                                // ---------------------------------
 
                                 if (!word.equals(originalWord)) {
+
                                     exactMatch = false;
 
                                     if (!suggestedKeywords.contains(word)) {
@@ -159,233 +151,194 @@ public class SearchService {
 
                                 boolean matched = false;
 
+                                // ---------------------------------
+                                // OFFER TITLE MATCH
+                                // ---------------------------------
 
-                                /*
-                                 * Match offer title
-                                 */
-
-                                if (offer.getTitle() != null &&
-                                        offer.getTitle()
-                                                .toLowerCase()
-                                                .contains(word)) {
+                                if (
+                                        offer.getTitle() != null &&
+                                                offer.getTitle()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
 
                                     matched = true;
 
                                     relevanceScore += 35;
                                 }
 
-                                /*
-                                 * Match merchant name
-                                 */
+                                // ---------------------------------
+                                // MERCHANT MATCH
+                                // ---------------------------------
 
-                                if (!matched &&
-                                        offer.getMerchant() != null) {
-
-                                    String merchantName =
-                                            offer.getMerchant()
-                                                    .getName()
-                                                    .toLowerCase();
-
-                                    /*
-                                     * Exact merchant match
-                                     */
-
-                                    if (merchantName.contains(word)) {
-
-                                        matched = true;
-
-                                        relevanceScore += 40;
-                                    }
-
-                                }
-
-                                /*
-                                 * Match merchant description
-                                 */
-
-                                if (!matched &&
-                                        offer.getMerchant() != null &&
-                                        offer.getMerchant()
-                                                .getDescription() != null &&
-                                        offer.getMerchant()
-                                                .getDescription()
-                                                .toLowerCase()
-                                                .contains(word)) {
+                                if (
+                                        !matched &&
+                                                offer.getMerchant() != null &&
+                                                offer.getMerchant()
+                                                        .getName()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
 
                                     matched = true;
 
-                                    relevanceScore += 15;
+                                    relevanceScore += 40;
                                 }
 
+                                // ---------------------------------
+                                // CATEGORY MATCH
+                                // ---------------------------------
 
-                                /*
-                                 * Match category
-                                 */
-
-                                if (!matched &&
-                                        offer.getCategory() != null &&
-                                        offer.getCategory()
-                                                .getName()
-                                                .toLowerCase()
-                                                .contains(word)) {
-
-                                    matched = true;
-
-                                    relevanceScore += 20;
-                                }
-
-
-                                /*
-                                 * Match bank name
-                                 */
-
-                                if (!matched &&
-                                        offer.getCard() != null &&
-                                        offer.getCard()
-                                                .getBank()
-                                                .getName()
-                                                .toLowerCase()
-                                                .contains(word)) {
-
-                                    matched = true;
-
-                                    relevanceScore += 15;
-                                }
-
-
-                                /*
-                                 * Match card network
-                                 */
-
-                                if (!matched &&
-                                        offer.getCard() != null &&
-                                        offer.getCard()
-                                                .getNetwork() != null &&
-                                        offer.getCard()
-                                                .getNetwork()
-                                                .name()
-                                                .toLowerCase()
-                                                .contains(word)) {
-
-                                    matched = true;
-
-                                    relevanceScore += 15;
-                                }
-
-
-                                /*
-                                 * Match reward type
-                                 */
-
-                                if (!matched &&
-                                        offer.getCard() != null &&
-                                        offer.getCard()
-                                                .getRewardType() != null &&
-                                        offer.getCard()
-                                                .getRewardType()
-                                                .name()
-                                                .toLowerCase()
-                                                .contains(word)) {
-
-                                    matched = true;
-
-                                    relevanceScore += 20;
-                                }
-
-
-                                /*
-                                 * Match benefit type
-                                 */
-
-                                if (!matched &&
-                                        offer.getBenefitRule() != null &&
-                                        offer.getBenefitRule()
-                                                .getBenefitType()
-                                                .name()
-                                                .toLowerCase()
-                                                .contains(word)) {
+                                if (
+                                        !matched &&
+                                                offer.getCategory() != null &&
+                                                offer.getCategory()
+                                                        .getName()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
 
                                     matched = true;
 
                                     relevanceScore += 25;
                                 }
 
-                                /*
-                                 * Match offer platform
-                                 */
+                                // ---------------------------------
+                                // BANK MATCH
+                                // ---------------------------------
 
-                                if (!matched &&
-                                        offer.getPlatform() != null &&
-                                        offer.getPlatform()
-                                                .name()
-                                                .toLowerCase()
-                                                .contains(word)) {
+                                if (
+                                        !matched &&
+                                                offer.getCard() != null &&
+                                                offer.getCard()
+                                                        .getBank()
+                                                        .getName()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
 
                                     matched = true;
 
                                     relevanceScore += 20;
                                 }
 
+                                // ---------------------------------
+                                // NETWORK MATCH
+                                // ---------------------------------
 
-                                /*
-                                 * If keyword not matched or matched added keyword
-                                 * not reject this offer
-                                 */
+                                if (
+                                        !matched &&
+                                                offer.getCard() != null &&
+                                                offer.getCard()
+                                                        .getNetwork()
+                                                        .name()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
+
+                                    matched = true;
+
+                                    relevanceScore += 15;
+                                }
+
+                                // ---------------------------------
+                                // REWARD TYPE MATCH
+                                // ---------------------------------
+
+                                if (
+                                        !matched &&
+                                                offer.getCard()
+                                                        .getRewardType()
+                                                        .name()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
+
+                                    matched = true;
+
+                                    relevanceScore += 20;
+                                }
+
+                                // ---------------------------------
+                                // BENEFIT TYPE MATCH
+                                // ---------------------------------
+
+                                if (
+                                        !matched &&
+                                                offer.getBenefitRule() != null &&
+                                                offer.getBenefitRule()
+                                                        .getBenefitType()
+                                                        .name()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
+
+                                    matched = true;
+
+                                    relevanceScore += 25;
+                                }
+
+                                // ---------------------------------
+                                // PLATFORM MATCH
+                                // ---------------------------------
+
+                                if (
+                                        !matched &&
+                                                offer.getPlatform() != null &&
+                                                offer.getPlatform()
+                                                        .name()
+                                                        .toLowerCase()
+                                                        .contains(word)
+                                ) {
+
+                                    matched = true;
+
+                                    relevanceScore += 20;
+                                }
+
+                                // ---------------------------------
+                                // STORE MATCH RESULT
+                                // ---------------------------------
+
                                 if (matched) {
 
-                                    if (!matchedKeywords.contains(word)) {
-
-                                        matchedKeywords.add(word);
-                                    }
+                                    matchedKeywords.add(word);
 
                                 } else {
 
-                                    if (!unmatchedKeywords.contains(word)) {
-
-                                        unmatchedKeywords.add(word);
-                                    }
+                                    unmatchedKeywords.add(word);
                                 }
-
                             }
+
+                            // =====================================
+                            // REJECT NON-MATCHED RESULTS
+                            // =====================================
 
                             if (matchedKeywords.isEmpty()) {
 
                                 return null;
                             }
 
-
-                            /*
-                             * Recommendation score
-                             *
-                             * Measures:
-                             * actual usefulness/value
-                             */
+                            // =====================================
+                            // BENEFIT SCORING
+                            // =====================================
 
                             int recommendationScore = 10;
 
-                            String benefitType =
-                                    "UNKNOWN";
+                            BenefitType benefitType = null;
 
                             String benefitSummary =
                                     "Benefit details unavailable";
 
-
-                            /*
-                             * BenefitRule-based scoring
-                             */
-
                             if (offer.getBenefitRule() != null) {
 
-                                BenefitType currentBenefitType =
+                                benefitType =
                                         offer.getBenefitRule()
                                                 .getBenefitType();
 
-                                benefitType =
-                                        currentBenefitType.name();
-
                                 recommendationScore =
                                         getBenefitTypeWeight(
-                                                currentBenefitType
+                                                benefitType
                                         );
 
                                 benefitSummary =
@@ -394,103 +347,98 @@ public class SearchService {
                                         );
                             }
 
+                            // =====================================
+                            // BOOST SCORES
+                            // =====================================
 
-                            /*
-                             * Boost permanent offers
-                             */
-
-                            if (Boolean.TRUE.equals(
-                                    offer.getPermanentOffer()
-                            )) {
+                            if (
+                                    Boolean.TRUE.equals(
+                                            offer.getPermanentOffer()
+                                    )
+                            ) {
 
                                 recommendationScore += 10;
                             }
 
-
-                            /*
-                             * Boost limited-time offers
-                             */
-
-                            if (Boolean.TRUE.equals(
-                                    offer.getLimitedTimeOffer()
-                            )) {
+                            if (
+                                    Boolean.TRUE.equals(
+                                            offer.getLimitedTimeOffer()
+                                    )
+                            ) {
 
                                 recommendationScore += 5;
                             }
 
-
-                            /*
-                             * Add admin priority
-                             */
-
                             recommendationScore +=
                                     offer.getPriority();
-
-                            /*
-                             * Boost offers with more
-                             * matched keywords
-                             */
 
                             relevanceScore +=
                                     matchedKeywords.size() * 15;
 
-                            /*
-                             * Calculate keyword match percentage
-                             */
+                            // =====================================
+                            // MATCH PERCENTAGE
+                            // =====================================
 
                             double matchPercentage =
                                     Math.round(
-                                            ((double) matchedKeywords.size()
-                                                    / keywords.size()) * 100
+                                            (
+                                                    (double)
+                                                            matchedKeywords.size()
+                                                            /
+                                                            keywords.size()
+                                            ) * 100
                                     );
+
+                            // =====================================
+                            // SEARCH MESSAGE
+                            // =====================================
 
                             String searchMessage = null;
 
                             if (!suggestedKeywords.isEmpty()) {
 
                                 searchMessage =
-                                        "Showing results related to  " +
+                                        "Showing results related to " +
                                                 String.join(
                                                         ", ",
                                                         suggestedKeywords
                                                 );
                             }
 
-
-                            /*
-                             * Final intelligent ranking
-                             */
+                            // =====================================
+                            // FINAL SCORE
+                            // =====================================
 
                             int finalScore =
                                     recommendationScore +
                                             relevanceScore;
 
+                            // =====================================
+                            // ESTIMATED SAVINGS
+                            // =====================================
 
-                            /*
-                             * Estimated savings
-                             */
-
-                            Double estimatedSavings =
-                                    null;
+                            Double estimatedSavings = null;
 
                             if (amount != null) {
 
                                 estimatedSavings =
-                                        (amount *
-                                                offer.getValue()) / 100;
+                                        (amount * offer.getValue())
+                                                / 100;
                             }
 
-
-                            /*
-                             * Build response
-                             */
+                            // =====================================
+                            // BUILD RESPONSE
+                            // =====================================
 
                             return SearchCardResponse
                                     .builder()
 
+                                    // -----------------------------
+                                    // CARD DETAILS
+                                    // -----------------------------
+
                                     .cardName(
-                                            offer.getCard()
-                                                    .getName()
+                                            offer.getCard().getName()
                                     )
 
                                     .bankName(
@@ -498,6 +446,72 @@ public class SearchService {
                                                     .getBank()
                                                     .getName()
                                     )
+
+                                    .imageUrl(
+                                            offer.getCard()
+                                                    .getImageUrl()
+                                    )
+
+                                    .network(
+                                            offer.getCard()
+                                                    .getNetwork()
+                                                    .name()
+                                    )
+
+                                    .rewardType(
+                                            offer.getCard()
+                                                    .getRewardType()
+                                    )
+
+                                    .cardLevel(
+                                            offer.getCard()
+                                                    .getCardLevel()
+                                                    .name()
+                                    )
+
+                                    .ltf(
+                                            offer.getCard()
+                                                    .getLtf()
+                                    )
+
+                                    .annualFee(
+                                            offer.getCard()
+                                                    .getAnnualFee()
+                                    )
+
+                                    .joiningFee(
+                                            offer.getCard()
+                                                    .getJoiningFee()
+                                    )
+
+                                    .forexMarkup(
+                                            offer.getCard()
+                                                    .getForexMarkup()
+                                    )
+
+                                    .airportLoungeAccess(
+                                            offer.getCard()
+                                                    .getAirportLoungeAccess()
+                                    )
+
+                                    .domesticLoungeAccess(
+                                            offer.getCard()
+                                                    .getDomesticLoungeAccess()
+                                    )
+
+                                    .internationalLoungeAccess(
+                                            offer.getCard()
+                                                    .getInternationalLoungeAccess()
+                                    )
+
+                                    .coBrandPartner(
+                                            offer.getCard()
+                                                    .getCoBrandPartner()
+                                    )
+
+                                    // -----------------------------
+                                    // OFFER DETAILS
+                                    // -----------------------------
 
                                     .offerTitle(
                                             offer.getTitle()
@@ -533,42 +547,51 @@ public class SearchService {
                                             offer.getLimitedTimeOffer()
                                     )
 
-                                    .imageUrl(
-                                            offer.getCard()
-                                                    .getImageUrl()
-                                    )
-
-                                    .network(
-                                            offer.getCard()
-                                                    .getNetwork()
-                                                    .name()
-                                    )
-
-                                    .rewardType(
-                                            offer.getCard()
-                                                    .getRewardType()
-                                                    .name()
-                                    )
-
                                     .priority(
                                             offer.getPriority()
                                     )
 
+                                    // -----------------------------
+                                    // BENEFIT DETAILS
+                                    // -----------------------------
+
                                     .benefitType(
                                             benefitType
+                                    )
+
+                                    .benefitRuleName(
+                                            offer.getBenefitRule()
+                                                    .getName()
                                     )
 
                                     .benefitSummary(
                                             benefitSummary
                                     )
 
-                                    .recommendationScore(
-                                            finalScore
+                                    .cashbackCap(
+                                            offer.getCashbackCap()
+                                    )
+
+                                    .minimumSpend(
+                                            offer.getMinimumSpend()
+                                    )
+
+                                    .maxBenefit(
+                                            offer.getMaxBenefit()
                                     )
 
                                     .estimatedSavings(
                                             estimatedSavings
                                     )
+
+                                    // -----------------------------
+                                    // SEARCH ANALYTICS
+                                    // -----------------------------
+
+                                    .recommendationScore(
+                                            finalScore
+                                    )
+
                                     .matchedKeywords(
                                             matchedKeywords
                                     )
@@ -580,9 +603,11 @@ public class SearchService {
                                     .matchedKeywordCount(
                                             matchedKeywords.size()
                                     )
+
                                     .matchPercentage(
                                             matchPercentage
                                     )
+
                                     .suggestedKeywords(
                                             suggestedKeywords
                                     )
@@ -595,19 +620,18 @@ public class SearchService {
                                             exactMatch
                                     )
 
-
                                     .build();
                         })
 
-                        /*
-                         * Remove rejected offers
-                         */
+                        // -----------------------------------------
+                        // REMOVE NULL RESULTS
+                        // -----------------------------------------
 
                         .filter(response -> response != null)
 
-                        /*
-                         * Sort highest ranked first
-                         */
+                        // -----------------------------------------
+                        // SORT BEST RESULTS FIRST
+                        // -----------------------------------------
 
                         .sorted(
                                 Comparator.comparing(
@@ -618,115 +642,121 @@ public class SearchService {
 
                         .toList();
 
-
-        /*
-         * No results found
-         */
-
-        if (results.isEmpty()) {
-
-            throw new ResourceNotFoundException(
-                    "No offers found"
-            );
-        }
+        // -----------------------------------------------------
+        // RETURN RESULTS
+        // -----------------------------------------------------
 
         return results;
     }
 
-    /*
-     * Recommendation strength
-     * based on real user value
-     */
+    // =========================================================
+// BUILD BENEFIT SUMMARY
+// =========================================================
 
     private int getBenefitTypeWeight(
             BenefitType benefitType
     ) {
 
         return switch (benefitType) {
+            case REAL_CASHBACK->100;
 
-            case REAL_CASHBACK -> 100;
+            case STATEMENT_CREDIT -> 99;
 
-            case STATEMENT_CREDIT -> 95;
 
-            case INSTANT_DISCOUNT -> 90;
+            case WALLET_BALANCE -> 95;
 
-            case WALLET_CASHBACK -> 80;
+            case REWARD_POINTS -> 80;
 
-            case AIR_MILES -> 75;
+            case AIRLINE_MILES -> 75;
+
+            case HOTEL_POINTS -> 70;
 
             case VOUCHER -> 65;
 
-            case REWARD_POINTS -> 55;
+            case CASHPOINTS -> 60;
 
-            case EMI_BENEFIT -> 40;
+            case EDGE_REWARDS -> 55;
 
-            case FUEL_WAIVER -> 35;
-
-            case LOUNGE_ACCESS -> 30;
-
-            default -> 10;
+            case MILESTONE_REWARD -> 50;
         };
     }
 
-
-    /*
-     * User-friendly explanation
-     * of offer benefit
-     */
+        // -----------------------------------------------------
+        // BENEFIT TYPE SUMMARY
+        // -----------------------------------------------------
 
     private String buildBenefitSummary(
             Offer offer
     ) {
 
+        if (
+                offer.getBenefitRule() == null
+                        ||
+                        offer.getBenefitRule().getBenefitType() == null
+        ) {
+
+            return "Card benefit available";
+        }
+
         String value =
-                offer.getValue() + "%";
+                offer.getValue() != null
+                        ? offer.getValue() + "%"
+                        : "";
 
         return switch (
                 offer.getBenefitRule()
                         .getBenefitType()
                 ) {
-
             case REAL_CASHBACK ->
+
                     value +
-                            " real cashback credited to statement";
+                            " REAL_CASHBACK You Get to Your Card Limits";
 
             case STATEMENT_CREDIT ->
-                    value +
-                            " statement credit benefit";
 
-            case WALLET_CASHBACK ->
                     value +
-                            " cashback credited to wallet";
+                            " cashback credited to statement";
 
-            case INSTANT_DISCOUNT ->
+            case WALLET_BALANCE ->
+
                     value +
-                            " instant discount on payment";
+                            " cashback credited to wallet balance";
 
             case REWARD_POINTS ->
-                    value +
-                            " equivalent reward points benefit";
 
-            case AIR_MILES ->
                     value +
-                            " travel air miles rewards";
+                            " reward points benefit";
+
+            case AIRLINE_MILES ->
+
+                    value +
+                            " airline miles reward";
+
+            case HOTEL_POINTS ->
+
+                    value +
+                            " hotel loyalty points";
 
             case VOUCHER ->
+
                     value +
-                            " voucher-based reward benefit";
+                            " voucher reward benefit";
 
-            case EMI_BENEFIT ->
-                    "No-cost EMI or EMI savings";
+            case CASHPOINTS ->
 
-            case FUEL_WAIVER ->
-                    "Fuel surcharge waiver available";
+                    value +
+                            " cashpoints reward";
 
-            case LOUNGE_ACCESS ->
-                    "Complimentary lounge access";
+            case EDGE_REWARDS ->
 
-            default ->
-                    "Card benefit available";
+                    value +
+                            " edge rewards benefit";
+
+            case MILESTONE_REWARD ->
+
+                    "Milestone reward available";
+
+            default -> "Card benefit available";
         };
     }
-
-
 }

@@ -8,29 +8,49 @@ import lombok.Getter;
 @Builder
 public class BenefitRuleResponse {
 
+    // =========================================================
+    // ID
+    // =========================================================
+
     private Long id;
+
+    // =========================================================
+    // BASIC DETAILS
+    // =========================================================
 
     private String name;
 
+    // =========================================================
+    // BENEFIT TYPE
+    // =========================================================
+
     private BenefitType benefitType;
 
-    private Double rewardPointValue;
+    // =========================================================
+    // REWARD POINT CONVERSION
+    // =========================================================
+
+    private Double rewardPointConversion;
+
+    // =========================================================
+    // REDEMPTION RULES
+    // =========================================================
 
     private Double redemptionFee;
 
     private Integer minimumRedemptionPoints;
 
+    // =========================================================
+    // EXPIRY RULES
+    // =========================================================
+
     private Boolean expiryApplicable;
 
     private Integer expiryMonths;
 
-    private Boolean statementCreditSupported;
-
-    private Boolean walletTransferSupported;
-
-    private Boolean travelRedemptionSupported;
-
-    private Boolean voucherRedemptionSupported;
+    // =========================================================
+    // EXTRA NOTES
+    // =========================================================
 
     private String notes;
 }
